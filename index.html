@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuesioner AHP Agregator Gas</title>
+<style>
+  :root { --ink:#1c2530; --mute:#5b6775; --line:#d5dbe2; --cell:#eef1f5; --mid:#dfe9f1; --accent:#0b5c7a; --bad:#b3261e; --badbg:#fdecea; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f6f7f9; color:var(--ink); font:16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; line-height:1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.2rem; margin: 0 0 6px; }
+  .sub { color: var(--mute); margin: 0 0 16px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px; margin:16px 0; }
+  .ask { font-weight:600; margin: 0 0 12px; }
+  label.f { display:block; font-weight:600; margin: 12px 0 4px; }
+  input[type=text], input[type=password], textarea { width:100%; padding:10px; border:1px solid #aab3be; border-radius:6px; font:inherit; }
+  textarea { min-height: 110px; resize: vertical; }
+  .opts label { display:block; padding:6px 0; }
+  .opts input[type=text] { width:auto; min-width: 220px; margin-left: 6px; padding:6px 8px; }
+  input[type=radio] { accent-color: var(--accent); width:18px; height:18px; margin:0; }
+  ol.how { margin: 0 0 12px; padding-left: 20px; }
+  table { border-collapse: collapse; width:100%; font-size:.92rem; }
+  th, td { text-align:left; vertical-align:top; padding:6px 8px; border-top:1px solid var(--line); }
+  th { white-space:nowrap; }
+  .scale td:first-child { font-weight:700; width:3rem; }
+  .ex { background:#fffbe0; border:1px solid #efe6a8; border-radius:8px; padding:12px; margin-top:12px; }
+  .ex p { margin: 0 0 8px; font-size:.92rem; }
+
+  .grid { margin-top: 16px; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .row, .head { display:grid; grid-template-columns: minmax(0,1fr) repeat(9, 2.4rem) minmax(0,1fr); align-items:stretch; }
+  .head { background:#fff; font-size:.8rem; color:var(--mute); position:sticky; top:0; z-index:1; border-bottom:1px solid var(--line); }
+  .head > div { padding:6px 4px; text-align:center; }
+  .head .n { font-weight:700; color:var(--ink); background:var(--cell); }
+  .head .n.mid, .c.mid { background: var(--mid); }
+  .head .hl { text-align:right; } .head .hr { text-align:left; }
+  .row { border-top:1px solid var(--line); }
+  .row:first-of-type { border-top:0; }
+  .l, .r { padding:10px 12px; background:var(--cell); font-size:.92rem; display:flex; align-items:center; }
+  .l { justify-content:flex-end; text-align:right; }
+  .c { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; min-height:44px; border-left:1px solid var(--line); }
+  .r { border-left:1px solid var(--line); }
+  .c span { display:none; font-size:.72rem; color:var(--mute); }
+  .c:hover { background:#f3f7fa; }
+  .row.miss .l, .row.miss .r { background: var(--badbg); box-shadow: inset 3px 0 0 var(--bad); }
+  .err { color: var(--bad); font-weight:600; margin: 12px 0 0; }
+  .field-miss { outline: 2px solid var(--bad); outline-offset: 2px; border-radius:6px; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:12px 28px; font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.55; cursor:default; }
+  .done { text-align:center; padding:48px 20px; }
+  pre { white-space:pre-wrap; word-break:break-word; text-align:left; background:var(--cell); padding:12px; border-radius:8px; font-size:.8rem; }
+
+  @media (max-width: 720px) {
+    .head { display:none; }
+    .row { grid-template-columns: repeat(9, 1fr); background:#fff; padding-bottom:4px; }
+    .l { grid-row:1; grid-column:1 / 5; justify-content:flex-start; text-align:left; }
+    .r { grid-row:1; grid-column:6 / 10; justify-content:flex-end; text-align:right; border-left:0; }
+    .l, .r { background:transparent; font-weight:600; padding:10px 8px 4px; }
+    .c { grid-row:2; border-left:0; min-height:52px; }
+    .c span { display:block; }
+    .row.miss { background: var(--badbg); }
+    .row.miss .l, .row.miss .r { background:transparent; box-shadow:none; }
+    section { padding:16px 12px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kuesioner Pembobotan Kriteria (AHP)</h1>
+  <p class="sub">Kajian Agregator dan Integrator Gas Nasional. CPPM SBM ITB, November 2026.</p>
+
+  <form id="gate">
+    <section>
+      <h2>Masuk</h2>
+      <label class="f" for="pw">Kata sandi</label>
+      <input type="password" id="pw" autocomplete="off" required>
+      <p style="margin:12px 0 0"><button type="submit" id="open">Buka Kuesioner</button></p>
+      <p class="err" id="gateErr" role="alert" hidden></p>
+    </section>
+  </form>
+
+  <form id="form" novalidate hidden>
+
+    <section>
+      <h2>Tujuan</h2>
+      <p style="margin:0">Kuesioner ini menentukan seberapa penting tiap kriteria yang akan dipakai untuk menilai model bisnis agregator dan integrator gas nasional. Bapak/Ibu tidak menilai model tertentu, hanya membandingkan pentingnya kriteria. Pengisian memerlukan sekitar 15 menit.</p>
+    </section>
+
+    <section id="ident">
+      <h2>Identitas Pengisi</h2>
+      <label class="f" for="nama">Nama</label>
+      <input type="text" id="nama" maxlength="200" autocomplete="name">
+      <label class="f" for="jabatan">Jabatan</label>
+      <input type="text" id="jabatan" maxlength="200">
+      <label class="f" id="streamLbl">Stream</label>
+      <div class="opts" id="stream" role="radiogroup" aria-labelledby="streamLbl">
+        <label><input type="radio" name="stream" value="Project Lead / PMO"> Project Lead / PMO</label>
+        <label><input type="radio" name="stream" value="Teknis"> Teknis</label>
+        <label><input type="radio" name="stream" value="Komersial"> Komersial</label>
+        <label><input type="radio" name="stream" value="Regulasi & Kepatuhan"> Regulasi &amp; Kepatuhan</label>
+        <label><input type="radio" name="stream" value="Lainnya"> Lainnya: <input type="text" id="streamLain" maxlength="150" aria-label="Stream lainnya"></label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Cara Mengisi</h2>
+      <p>Setiap baris membandingkan dua kriteria: kriteria di sisi Kiri dan kriteria di sisi Kanan. Pilih satu jawaban pada setiap baris.</p>
+      <ol class="how">
+        <li>Bila kriteria Kiri lebih penting, pilih angka di sisi kiri (9, 7, 5, atau 3).</li>
+        <li>Bila kriteria Kanan lebih penting, pilih angka di sisi kanan (3, 5, 7, atau 9).</li>
+        <li>Bila keduanya sama penting, pilih angka 1 di tengah.</li>
+        <li>Makin jauh dari tengah, makin besar perbedaan pentingnya.</li>
+      </ol>
+      <table class="scale">
+        <tr><th>Angka</th><th>Arti</th></tr>
+        <tr><td>1</td><td>Kedua kriteria sama penting</td></tr>
+        <tr><td>3</td><td>Satu kriteria sedikit lebih penting</td></tr>
+        <tr><td>5</td><td>Satu kriteria lebih penting</td></tr>
+        <tr><td>7</td><td>Satu kriteria sangat lebih penting</td></tr>
+        <tr><td>9</td><td>Satu kriteria mutlak lebih penting</td></tr>
+      </table>
+      <div class="ex">
+        <p><b>Contoh.</b> Pengisi menilai Faktor B lebih penting daripada Faktor A, sehingga memilih angka 5 di sisi kanan, yaitu sisi Faktor B.</p>
+        <div class="grid" id="example"></div>
+      </div>
+      <p style="margin:12px 0 0">Mohon jaga agar jawaban saling konsisten. Misalnya, bila A lebih penting dari B dan B lebih penting dari C, maka A sebaiknya juga lebih penting dari C.</p>
+    </section>
+
+    <div id="groups"></div>
+
+    <section>
+      <h2>Catatan atau Keberatan (opsional)</h2>
+      <label class="f" for="catatan" style="font-weight:400;margin-top:0">Tuliskan bila ada kriteria yang menurut Bapak/Ibu perlu ditambah, digabung, dihapus, atau didefinisikan ulang.</label>
+      <textarea id="catatan" maxlength="5000"></textarea>
+    </section>
+
+    <button type="submit" id="send">Kirim Jawaban</button>
+    <p class="err" id="err" role="alert" hidden></p>
+  </form>
+
+  <section class="done" id="done" hidden>
+    <h2>Terima kasih atas waktu dan masukan Bapak/Ibu.</h2>
+    <p>Jawaban sudah tersimpan. Halaman ini boleh ditutup.</p>
+  </section>
+</main>
+
+<script>
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwTn43Yxa7TQh3P4FwHOsxh4r9h36W7ehb9ouzWTqTAE9A2arpAIWpjJpj8UAxh9sWP/exec';
+const SCALE = [9, 7, 5, 3, 1, -3, -5, -7, -9];
+const $ = id => document.getElementById(id);
+const HEAD = '<div class="head"><div class="hl">Kiri lebih penting</div>' +
+  SCALE.map(v => `<div class="n${v === 1 ? ' mid' : ''}">${Math.abs(v)}</div>`).join('') +
+  '<div class="hr">Kanan lebih penting</div></div>';
+
+function row(id, left, right, opts = '') {
+  const cells = SCALE.map(v => {
+    const side = v === 1 ? 'Sama penting' : (v > 0 ? 'Kiri ' : 'Kanan ') + Math.abs(v);
+    return `<label class="c${v === 1 ? ' mid' : ''}"><input type="radio" name="${id}" value="${v}" aria-label="${side}" ${opts}${opts && v === -5 ? ' checked' : ''}><span>${Math.abs(v)}</span></label>`;
+  }).join('');
+  return `<div class="row" data-id="${id}" role="radiogroup" aria-label="${left[0]} dibanding ${right[0]}">
+    <div class="l"><span><b>${left[0]}</b> ${left[1]}</span></div>${cells}<div class="r"><span><b>${right[0]}</b> ${right[1]}</span></div></div>`;
+}
+
+const IDS = [];
+$('example').innerHTML = HEAD + row('contoh', ['', 'Faktor A'], ['', 'Faktor B'], 'disabled');
+// Isi kuesioner datang dari server setelah kata sandi benar, tidak ada di halaman publik ini.
+const render = groups => { $('groups').innerHTML = groups.map(g => {
+  let k = 0, rows = '';
+  g.items.forEach((a, i) => g.items.slice(i + 1).forEach(b => {
+    const id = (g.id === 'A' ? 'A' : g.id + '.') + (++k);
+    IDS.push(id);
+    rows += row(id, a, b);
+  }));
+  const defs = g.items.map(it => `<tr><th>${it[0]}</th><td><b>${it[1]}.</b> ${it[2]}</td></tr>`).join('');
+  return `<section><h2>${g.title}</h2><p class="ask">${g.ask}</p>
+    ${g.note ? `<p class="sub" style="margin-bottom:8px">${g.note}</p>` : ''}
+    <table>${defs}</table><div class="grid">${HEAD}${rows}</div></section>`;
+}).join(''); };
+
+let PASSWORD = '';
+// Body teks agar tanpa preflight; lintas-origin sehingga tanpa cookie Google.
+const post = body => fetch(ENDPOINT, { method: 'POST', body: JSON.stringify(body) }).then(r => r.json());
+
+$('gate').addEventListener('submit', e => {
+  e.preventDefault();
+  const pw = $('pw').value, btn = $('open'), err = $('gateErr');
+  const fail = x => { btn.disabled = false; btn.textContent = 'Buka Kuesioner'; err.textContent = x && x.message || x || 'Gagal memuat.'; err.hidden = false; };
+  btn.disabled = true; btn.textContent = 'Memeriksa...'; err.hidden = true;
+  post({ action: 'open', password: pw }).then(r => {
+    if (!r.ok) return fail(r.error);
+    PASSWORD = pw; render(r.groups); $('gate').hidden = true; $('form').hidden = false;
+  }).catch(fail);
+});
+
+// Hapus tanda "belum diisi" begitu baris dijawab.
+$('form').addEventListener('change', e => {
+  const r = e.target.closest('.row'); if (r) r.classList.remove('miss');
+  if (e.target.name === 'stream') $('stream').classList.remove('field-miss');
+});
+$('streamLain').addEventListener('input', () => { document.querySelector('[name=stream][value=Lainnya]').checked = true; });
+
+function collect() {
+  const picked = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value;
+  let stream = picked('stream') || '';
+  if (stream === 'Lainnya') stream = $('streamLain').value.trim() ? 'Lainnya: ' + $('streamLain').value.trim() : '';
+  const answers = {}, missing = [];
+  IDS.forEach(id => { const v = picked(id); v ? answers[id] = Number(v) : missing.push(id); });
+  return { data: { nama: $('nama').value.trim(), jabatan: $('jabatan').value.trim(), stream, answers, catatan: $('catatan').value.trim() }, missing };
+}
+
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const { data, missing } = collect(), err = $('err');
+  const fields = [['nama', !data.nama], ['jabatan', !data.jabatan], ['stream', !data.stream]];
+  fields.forEach(([id, bad]) => $(id).classList.toggle('field-miss', bad));
+  document.querySelectorAll('#groups .row').forEach(r => r.classList.toggle('miss', missing.includes(r.dataset.id)));
+  const identBad = fields.some(f => f[1]);
+  if (identBad || missing.length) {
+    err.textContent = (identBad ? 'Identitas belum lengkap. ' : '') + (missing.length ? missing.length + ' perbandingan belum diisi (ditandai merah).' : '');
+    err.hidden = false;
+    (identBad ? $('ident') : document.querySelector('.row.miss')).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  err.hidden = true;
+  const btn = $('send'); btn.disabled = true; btn.textContent = 'Mengirim...';
+  const ok = () => { $('form').hidden = true; $('done').hidden = false; window.scrollTo(0, 0); };
+  const fail = x => { // Jawaban tetap ada di halaman, pengisi bisa mencoba lagi.
+    btn.disabled = false; btn.textContent = 'Kirim Jawaban';
+    err.textContent = 'Gagal mengirim: ' + (x && x.message || x) + ' Silakan coba lagi.'; err.hidden = false;
+  };
+  post({ ...data, password: PASSWORD }).then(r => r.ok ? ok() : fail(r.error)).catch(fail);
+});
+</script>
+</body>
+</html>
